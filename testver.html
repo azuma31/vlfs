@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VLFS Premium Viewer</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="premium-badge">PREMIUM</div>
+        <h1>VLFS Premium Viewer</h1>
+        
+        <div class="card">
+            <div class="tabs">
+                <button class="tab active" data-tab="encrypt">暗号化</button>
+                <button class="tab" data-tab="decrypt">復号化</button>
+            </div>
+
+            <div class="premium-info">
+                VIP専用の強化された暗号化システムを使用しています
+            </div>
+
+            <div id="alertBox"></div>
+
+            <div id="encryptSection">
+                <div class="drop-zone" id="encryptDropZone">
+                    <div class="drop-zone-content">
+                        <div class="premium-icon">🔒</div>
+                        <p>ファイルをドラッグ＆ドロップするか、クリックして選択してください</p>
+                        <input type="file" id="encryptFile" multiple class="hidden">
+                    </div>
+                    <div class="glow-effect"></div>
+                </div>
+                <div class="form-group">
+                    <label for="encryptPassword">パスワード:</label>
+                    <div class="password-container">
+                        <input type="password" id="encryptPassword">
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar hidden">
+                        <div class="progress-bar-fill"></div>
+                    </div>
+                </div>
+                <button id="encryptButton" class="premium-button">暗号化</button>
+            </div>
+
+            <div id="decryptSection" class="hidden">
+                <div class="drop-zone" id="decryptDropZone">
+                    <div class="drop-zone-content">
+                        <div class="premium-icon">🔓</div>
+                        <p>.vlfsファイルをドラッグ＆ドロップするか、クリックして選択してください</p>
+                        <input type="file" id="decryptFile" accept=".vlfs" class="hidden">
+                    </div>
+                    <div class="glow-effect"></div>
+                </div>
+                <div class="form-group">
+                    <label for="decryptPassword">パスワード:</label>
+                    <div class="password-container">
+                        <input type="password" id="decryptPassword">
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar hidden">
+                        <div class="progress-bar-fill"></div>
+                    </div>
+                </div>
+                <button id="decryptButton" class="premium-button">復号化</button>
+            </div>
+        </div>
+
+        <div class="premium-footer">
+            <span class="premium-text">Premium Service</span>
+            <div class="security-badges">
+                <span class="badge">🛡️ Enhanced Security</span>
+                <span class="badge">🔐 Triple Encryption</span>
+                <span class="badge">⚡ Premium Speed</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // URLパラメータを確認
+        window.onload = function() {
+            if (window.location.hostname !== 'azuma31.github.io') {
+                document.body.innerHTML = '<div class="access-denied">Access Denied</div>';
+                return;
+            }
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const filePath = urlParams.get('file');
+            
+            if (filePath) {
+                tabControl.selectTab('decrypt');
+                document.getElementById('decryptFile').value = '';
+                // 自動処理モードを開始
+                autoLoadFile(filePath);
+            }
+        };
+
+        // タブ切り替え
+        const tabControl = {
+            selectTab: function(tabName) {
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.classList.remove('active');
+                    if (tab.dataset.tab === tabName) {
+                        tab.classList.add('active');
+                    }
+                });
+
+                const sections = {
+                    'encrypt': document.getElementById('encryptSection'),
+                    'decrypt': document.getElementById('decryptSection')
+                };
+
+                Object.values(sections).forEach(section => section.classList.add('hidden'));
+                sections[tabName].classList.remove('hidden');
+            }
+        };
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabControl.selectTab(tab.dataset.tab);
+            });
+        });
+
+        // アラート表示
+        function showAlert(message, type = 'success') {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.className = `alert alert-${type}`;
+            alertBox.textContent = message;
+            setTimeout(() => alertBox.className = '', 3000);
+        }
+
+        // プログレスバー更新
+        function updateProgress(progress) {
+            const progressBars = document.querySelectorAll('.progress-bar');
+            const progressBarFills = document.querySelectorAll('.progress-bar-fill');
+            
+            progressBars.forEach(bar => {
+                bar.classList.remove('hidden');
+            });
+            
+            progressBarFills.forEach(fill => {
+                fill.style.width = `${progress}%`;
+            });
+
+            if (progress >= 100) {
+                setTimeout(() => {
+                    progressBars.forEach(bar => {
+                        bar.classList.add('hidden');
+                    });
+                }, 1000);
+            }
+        }
+
+        // ドラッグ&ドロップ処理
+        ['encrypt', 'decrypt'].forEach(type => {
+            const dropZone = document.getElementById(`${type}DropZone`);
+            const fileInput = document.getElementById(`${type}File`);
+
+            dropZone.addEventListener('click', () => fileInput.click());
+
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('drag-over');
+            });
+
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('drag-over');
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('drag-over');
+                fileInput.files = e.dataTransfer.files;
+                showAlert('ファイルがアップロードされました！');
+            });
+
+            fileInput.addEventListener('change', () => {
+                showAlert('ファイルがアップロードされました！');
+            });
+        });
+
+        // 暗号化処理
+        document.getElementById('encryptButton').addEventListener('click', async () => {
+            const files = document.getElementById('encryptFile').files;
+            const password = document.getElementById('encryptPassword').value;
+
+            if (!files.length || !password) {
+                showAlert('ファイルとパスワードを入力してください。', 'error');
+                return;
+            }
+
+            if (password.length < 5) {
+                showAlert('パスワードは5文字以上で入力してください。', 'error');
+                return;
+            }
+
+            try {
+                for (let i = 0; i < files.length; i++) {
+                    updateProgress(10);
+                    const file = files[i];
+                    const fileData = await readFileAsArrayBuffer(file);
+                    
+                    updateProgress(30);
+                    const encrypted = await encryptData(fileData, password, file.name);
+                    
+                    updateProgress(80);
+                    downloadFile(
+                        new Blob([encrypted], { type: 'application/octet-stream' }),
+                        file.name + '.vlfs'
+                    );
+                    
+                    updateProgress(100);
+                }
+                
+                showAlert('暗号化が完了しました！');
+                document.getElementById('encryptPassword').value = '';
+                document.getElementById('encryptFile').value = '';
+            } catch (error) {
+                showAlert(error.message || '暗号化に失敗しました。', 'error');
+            }
+        });
+
+        // 復号化処理
+        document.getElementById('decryptButton').addEventListener('click', async () => {
+            const files = document.getElementById('decryptFile').files;
+            const password = document.getElementById('decryptPassword').value;
+
+            if (!files.length || !password) {
+                showAlert('ファイルとパスワードを入力してください。', 'error');
+                return;
+            }
+
+            try {
+                updateProgress(10);
+                const file = files[0];
+                const fileData = await readFileAsArrayBuffer(file);
+                
+                updateProgress(30);
+                const decrypted = await decryptData(fileData, password);
+                
+                updateProgress(80);
+                const tempFileName = 'vlfs_temp_' + Math.random().toString(36).substr(2, 9) + '_' + decrypted.fileName;
+                downloadFile(
+                    new Blob([decrypted.data], { type: 'application/octet-stream' }),
+                    tempFileName
+                );
+                
+                updateProgress(100);
+                showAlert('復号化が完了しました！');
+                document.getElementById('decryptPassword').value = '';
+                document.getElementById('decryptFile').value = '';
+            } catch (error) {
+                showAlert(error.message || '復号化に失敗しました。', 'error');
+            }
+        });
+
+        // ファイル読み込み
+        function readFileAsArrayBuffer(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error('ファイルの読み込みに失敗しました。'));
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        // ファイルダウンロード
+        function downloadFile(blob, fileName) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // VIP暗号化
+        async function encryptData(data, password, fileName) {
+            // 通常の暗号化
+            const salt = window.crypto.getRandomValues(new Uint8Array(16));
+            const iv = window.crypto.getRandomValues(new Uint8Array(16));
+            
+            const keyMaterial = await window.crypto.subtle.importKey(
+                'raw',
+                new TextEncoder().encode(password),
+                'PBKDF2',
+                false,
+                ['deriveBits']
+            );
+            
+            const key = await window.crypto.subtle.deriveBits(
+                {
+                    name: 'PBKDF2',
+                    salt: salt,
+                    iterations: 100000,
+                    hash: 'SHA-256'
+                },
+                keyMaterial,
+                256
+            );
+
+            // VIP追加暗号化
+            const vipKey = await window.crypto.subtle.importKey(
+                'raw',
+                key,
+                'AES-GCM',
+                false,
+                ['encrypt']
+            );
+
+            const fileNameBytes = new TextEncoder().encode(fileName);
+            const fileNameLength = new Uint8Array([fileNameBytes.length]);
+
+            const encrypted = await window.crypto.subtle.encrypt(
+                {
+                    name: 'AES-GCM',
+                    iv: iv,
+                    tagLength: 128
+                },
+                vipKey,
+                data
+            );
+
+            // 結合
+            const result = new Uint8Array(
+                salt.length + iv.length + fileNameLength.length +
+                fileNameBytes.length + encrypted.byteLength
+            );
+
+            let offset = 0;
+            result.set(salt, offset);
+            offset += salt.length;
+            result.set(iv, offset);
+            offset += iv.length;
+            result.set(fileNameLength, offset);
+            offset += fileNameLength.length;
+            result.set(fileNameBytes, offset);
+            offset += fileNameBytes.length;
+            result.set(new Uint8Array(encrypted), offset);
+
+            return result;
+        }
+
+        // VIP復号化
+        async function decryptData(encryptedData, password) {
+            try {
+                const data = new Uint8Array(encryptedData);
+                
+                // ヘッダー情報の抽出
+                let offset = 0;
+                const salt = data.slice(offset, offset + 16);
+                offset += 16;
+                const iv = data.slice(offset, offset + 16);
+                offset += 16;
+                
+                const fileNameLength = data[offset];
+                offset += 1;
+                
+                const fileName = new TextDecoder().decode(
+                    data.slice(offset, offset + fileNameLength)
+                );
+                offset += fileNameLength;
+                
+                const encryptedContent = data.slice(offset);
+
+                // キー導出
+                const keyMaterial = await window.crypto.subtle.importKey(
+                    'raw',
+                    new TextEncoder().encode(password),
+                    'PBKDF2',
+                    false,
+                    ['deriveBits']
+                );
+                
+                const key = await window.crypto.subtle.deriveBits(
+                    {
+                        name: 'PBKDF2',
+                        salt: salt,
+                        iterations: 100000,
+                        hash: 'SHA-256'
+                    },
+                    keyMaterial,
+                    256
+                );
+
+                // VIP復号化
+                const vipKey = await window.crypto.subtle.importKey(
+                    'raw',
+                    key,
+                    'AES-GCM',
+                    false,
+                    ['decrypt']
+                );
+
+                const decrypted = await window.crypto.subtle.decrypt(
+                    {
+                        name: 'AES-GCM',
+                        iv: iv,
+                        tagLength: 128
+                    },
+                    vipKey,
+                    encryptedContent
+                );
+
+                return {
+                    fileName: fileName,
+                    data: decrypted
+                };
+            } catch (error) {
+                throw new Error('復号化に失敗しました。パスワードが正しいか確認してください。');
+            }
+        }
+
+        // 自動ファイル読み込み
+        async function autoLoadFile(filePath) {
+            try {
+                const response = await fetch('file://' + filePath);
+                const data = await response.arrayBuffer();
+                document.getElementById('decryptFile').files = new FileList([new File([data], 'temp.vlfs')]);
+                showAlert('ファイルを読み込みました。パスワードを入力してください。');
+            } catch (error) {
+                showAlert('ファイルの読み込みに失敗しました。', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

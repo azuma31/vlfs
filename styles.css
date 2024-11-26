@@ -1,0 +1,422 @@
+:root {
+    --primary: #ffd700;
+    --primary-hover: #ffed4a;
+    --background: #0a0a0a;
+    --card: #1a1a1a;
+    --card-hover: #2a2a2a;
+    --border: #333;
+    --text: #fff;
+    --text-secondary: #aaa;
+    --error: #ff4444;
+    --success: #00c851;
+    --warning: #ffbb33;
+    --glow: 0 0 10px rgba(255, 215, 0, 0.5);
+    --premium-gradient: linear-gradient(135deg, #ffd700 0%, #ffed4a 50%, #ffd700 100%);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body {
+    background: var(--background);
+    color: var(--text);
+    line-height: 1.5;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: 
+        radial-gradient(circle at 50% 0, rgba(255, 215, 0, 0.1), transparent 50%),
+        radial-gradient(circle at 100% 0, rgba(255, 215, 0, 0.05), transparent 50%);
+}
+
+.container {
+    max-width: 800px;
+    margin: 2rem;
+    position: relative;
+}
+
+.premium-badge {
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    background: var(--premium-gradient);
+    color: var(--background);
+    padding: 5px 15px;
+    border-radius: 15px;
+    font-weight: bold;
+    box-shadow: var(--glow);
+    animation: badgeGlow 2s infinite alternate;
+    z-index: 1;
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: center;
+    color: transparent;
+    background: var(--premium-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    text-shadow: var(--glow);
+}
+
+.card {
+    background: var(--card);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+    min-height: 450px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 1rem;
+}
+
+.tab {
+    padding: 0.75rem 1.5rem;
+    background: none;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--text);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.tab::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--premium-gradient);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.tab:hover::before,
+.tab.active::before {
+    opacity: 1;
+}
+
+.tab.active {
+    color: var(--background);
+    font-weight: bold;
+}
+
+.premium-info {
+    background: rgba(255, 215, 0, 0.1);
+    border-left: 4px solid var(--primary);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 0 0.5rem 0.5rem 0;
+    font-size: 0.875rem;
+    color: var(--primary);
+}
+
+/* アニメーション付きのセクション切り替え */
+#encryptSection, #decryptSection {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: absolute;
+    width: calc(100% - 4rem);
+    opacity: 1;
+    transform: translateX(0);
+}
+
+#encryptSection.hidden {
+    opacity: 0;
+    transform: translateX(-100%);
+    pointer-events: none;
+}
+
+#decryptSection.hidden {
+    opacity: 0;
+    transform: translateX(100%);
+    pointer-events: none;
+}
+
+.drop-zone {
+    border: 2px dashed var(--border);
+    padding: 2rem;
+    text-align: center;
+    border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.drop-zone:hover,
+.drop-zone.drag-over {
+    border-color: var(--primary);
+    background: rgba(255, 215, 0, 0.05);
+}
+
+.drop-zone .premium-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    text-shadow: var(--glow);
+}
+
+.glow-effect {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 215, 0, 0.2),
+        transparent
+    );
+    animation: glowSwipe 3s infinite;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--primary);
+}
+
+.password-container {
+    position: relative;
+}
+
+input[type="password"],
+input[type="text"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    background: var(--card);
+    color: var(--text);
+    transition: all 0.3s ease;
+}
+
+input[type="password"]:focus,
+input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: var(--glow);
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text);
+    cursor: pointer;
+    padding: 5px;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+}
+
+.password-toggle:hover {
+    opacity: 0.8;
+}
+
+.progress-container {
+    margin: 1.5rem 0;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 0.5rem;
+    background: var(--border);
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: var(--premium-gradient);
+    width: 0%;
+    transition: width 0.3s ease;
+    box-shadow: var(--glow);
+}
+
+.premium-button {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--background);
+    background: var(--premium-gradient);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--glow);
+}
+
+.premium-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+.premium-button:active {
+    transform: translateY(0);
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    animation: fadeIn 0.3s ease;
+}
+
+.alert-success {
+    background: rgba(0, 200, 81, 0.1);
+    color: var(--success);
+    border: 1px solid var(--success);
+}
+
+.alert-error {
+    background: rgba(255, 68, 68, 0.1);
+    color: var(--error);
+    border: 1px solid var(--error);
+}
+
+.premium-footer {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.premium-text {
+    color: var(--primary);
+    font-weight: bold;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.security-badges {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.badge {
+    background: rgba(255, 215, 0, 0.1);
+    color: var(--primary);
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+}
+
+.access-denied {
+    text-align: center;
+    font-size: 2rem;
+    color: var(--error);
+    padding: 2rem;
+}
+
+.hidden {
+    display: none;
+}
+
+@keyframes badgeGlow {
+    from {
+        box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    }
+    to {
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+    }
+}
+
+@keyframes glowSwipe {
+    0% {
+        left: -100%;
+    }
+    50% {
+        left: 100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 640px) {
+    .container {
+        margin: 1rem;
+    }
+
+    .card {
+        padding: 1.5rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    .premium-badge {
+        font-size: 0.875rem;
+        padding: 3px 10px;
+    }
+
+    .security-badges {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+/* アクセシビリティ対応 */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ハイコントラストモード対応 */
+@media (forced-colors: active) {
+    .premium-button,
+    .tab.active {
+        forced-color-adjust: none;
+    }
+}

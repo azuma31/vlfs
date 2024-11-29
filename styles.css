@@ -32,12 +32,14 @@ body {
     background-image: 
         radial-gradient(circle at 50% 0, rgba(255, 215, 0, 0.1), transparent 50%),
         radial-gradient(circle at 100% 0, rgba(255, 215, 0, 0.05), transparent 50%);
+    padding: 20px;
 }
 
 .container {
     max-width: 800px;
     margin: 2rem;
     position: relative;
+    width: 100%;
 }
 
 .premium-badge {
@@ -73,7 +75,7 @@ h1 {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     border: 1px solid var(--border);
     backdrop-filter: blur(10px);
-    min-height: 450px;
+    min-height: 700px;
     position: relative;
     overflow: hidden;
 }
@@ -132,13 +134,14 @@ h1 {
     color: var(--primary);
 }
 
-/* アニメーション付きのセクション切り替え */
 #encryptSection, #decryptSection {
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     position: absolute;
     width: calc(100% - 4rem);
     opacity: 1;
     transform: translateX(0);
+    min-height: 600px;
+    padding-bottom: 2rem;
 }
 
 #encryptSection.hidden {
@@ -155,7 +158,7 @@ h1 {
 
 .drop-zone {
     border: 2px dashed var(--border);
-    padding: 2rem;
+    padding: 4rem 2rem;
     text-align: center;
     border-radius: 0.75rem;
     margin-bottom: 1.5rem;
@@ -164,6 +167,10 @@ h1 {
     overflow: hidden;
     cursor: pointer;
     background: rgba(255, 255, 255, 0.03);
+    min-height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .drop-zone:hover,
@@ -172,9 +179,13 @@ h1 {
     background: rgba(255, 215, 0, 0.05);
 }
 
+.drop-zone-content {
+    width: 100%;
+}
+
 .drop-zone .premium-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
     text-shadow: var(--glow);
 }
 
@@ -194,15 +205,16 @@ h1 {
 }
 
 .form-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2.5rem;
     position: relative;
 }
 
 label {
     display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
     font-weight: 500;
     color: var(--primary);
+    font-size: 1.1rem;
 }
 
 .password-container {
@@ -212,10 +224,10 @@ label {
 input[type="password"],
 input[type="text"] {
     width: 100%;
-    padding: 0.75rem 1rem;
+    padding: 1rem 1.25rem;
     border: 2px solid var(--border);
     border-radius: 0.5rem;
-    font-size: 1rem;
+    font-size: 1.1rem;
     background: var(--card);
     color: var(--text);
     transition: all 0.3s ease;
@@ -230,16 +242,17 @@ input[type="text"]:focus {
 
 .password-toggle {
     position: absolute;
-    right: 10px;
+    right: 12px;
     top: 50%;
     transform: translateY(-50%);
     background: none;
     border: none;
     color: var(--text);
     cursor: pointer;
-    padding: 5px;
+    padding: 8px;
     transition: opacity 0.3s ease;
     z-index: 1;
+    font-size: 1.2rem;
 }
 
 .password-toggle:hover {
@@ -247,12 +260,12 @@ input[type="text"]:focus {
 }
 
 .progress-container {
-    margin: 1.5rem 0;
+    margin: 2.5rem 0;
 }
 
 .progress-bar {
     width: 100%;
-    height: 0.5rem;
+    height: 0.6rem;
     background: var(--border);
     border-radius: 1rem;
     overflow: hidden;
@@ -268,16 +281,17 @@ input[type="text"]:focus {
 
 .premium-button {
     width: 100%;
-    padding: 1rem;
+    padding: 1.25rem;
     border: none;
     border-radius: 0.5rem;
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: bold;
     color: var(--background);
     background: var(--premium-gradient);
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: var(--glow);
+    margin-top: 1rem;
 }
 
 .premium-button:hover {
@@ -318,21 +332,23 @@ input[type="text"]:focus {
     font-weight: bold;
     margin-bottom: 1rem;
     display: block;
+    font-size: 1.1rem;
 }
 
 .security-badges {
     display: flex;
     justify-content: center;
-    gap: 1rem;
+    gap: 1.5rem;
     flex-wrap: wrap;
+    margin-top: 1.5rem;
 }
 
 .badge {
     background: rgba(255, 215, 0, 0.1);
     color: var(--primary);
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1.5rem;
     border-radius: 1rem;
-    font-size: 0.875rem;
+    font-size: 0.95rem;
 }
 
 .access-denied {
@@ -378,14 +394,23 @@ input[type="text"]:focus {
     }
 }
 
-/* レスポンシブデザイン */
 @media (max-width: 640px) {
+    body {
+        padding: 10px;
+    }
+
     .container {
         margin: 1rem;
     }
 
     .card {
+        min-height: 600px;
         padding: 1.5rem;
+    }
+
+    #encryptSection, #decryptSection {
+        width: calc(100% - 3rem);
+        min-height: 500px;
     }
 
     h1 {
@@ -401,9 +426,13 @@ input[type="text"]:focus {
         flex-direction: column;
         align-items: center;
     }
+
+    .drop-zone {
+        min-height: 200px;
+        padding: 2rem;
+    }
 }
 
-/* アクセシビリティ対応 */
 @media (prefers-reduced-motion: reduce) {
     * {
         animation-duration: 0.01ms !important;
@@ -413,7 +442,6 @@ input[type="text"]:focus {
     }
 }
 
-/* ハイコントラストモード対応 */
 @media (forced-colors: active) {
     .premium-button,
     .tab.active {
